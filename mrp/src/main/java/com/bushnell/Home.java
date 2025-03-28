@@ -5,6 +5,7 @@ package com.bushnell;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.CardLayout;
@@ -19,8 +20,8 @@ import javax.swing.JPanel;
 
 // Class to get images from the resources directory
 class GetImage {
-    public JLabel getImage(String filename) {
-        return new JLabel(new ImageIcon(getClass().getResource("/resources/"+filename)));
+    public JLabel getImage(String filename, int w, int h) {
+        return new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("/resources/"+filename)).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
     }
 }
 
@@ -29,15 +30,14 @@ public class Home {
         // create panel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.setPreferredSize(new Dimension(1400, 800));
-        panel.setMaximumSize(new Dimension(1400, 800));
+        panel.setPreferredSize(new Dimension(1280, 720));
+        panel.setMaximumSize(new Dimension(1280, 720));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         // set background color
-        String bushnellBlueHashCode = "#011E40";
-        Color bushnellBlue = Color.decode(bushnellBlueHashCode);
-        panel.setBackground(bushnellBlue); 
+        Color black = Color.decode("#000000");
+        panel.setBackground(black); 
 
         // create menu box and submenu box
         Box homeBox = Box.createHorizontalBox();
@@ -53,7 +53,7 @@ public class Home {
         subMenuBox.setBorder(BorderFactory.createLineBorder(Color.WHITE));
         subMenuBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         subMenuBox.setAlignmentY(Component.TOP_ALIGNMENT);
-        homeBox.add(Box.createRigidArea(new Dimension(20,0)));
+        homeBox.add(Box.createRigidArea(new Dimension(10,0)));
         homeBox.add(menuBox);
         homeBox.add(Box.createRigidArea(new Dimension(20,0)));
         homeBox.add(subMenuBox);
@@ -64,7 +64,7 @@ public class Home {
         // create menu box
 
         // place an image on the panel as a JLabel
-        JLabel logo = new GetImage().getImage("BushnellLogo.png");
+        JLabel logo = new GetImage().getImage("VisualRoboticsLogo.png", 180, 51);
         logo.setAlignmentX(Component.LEFT_ALIGNMENT);
         menuBox.add(Box.createRigidArea(new Dimension(0,10)));
         menuBox.add(logo);
@@ -93,9 +93,9 @@ public class Home {
         menuBox.add(buttonBox);
 
         // create panels for each sub-menu
-        JPanel appointmentPanel       = Appointment.makeGUI();
-        JPanel clientInformationPanel = ClientInformation.makeGUI();
-        JPanel onlineAdvicePanel      = OnlineAdvice.makeGUI();
+        JPanel appointmentPanel       = new JPanel();
+        JPanel clientInformationPanel = new JPanel();
+        JPanel onlineAdvicePanel      = new JPanel();
 
         // create a card panel (only one panel visible at a time)
         JPanel cardPanel = new JPanel(new CardLayout());

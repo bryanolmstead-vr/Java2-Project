@@ -1,17 +1,19 @@
 package com.bushnell;
 
-/**
- * Hello world!
- */
-public final class App {
-    private App() {
-    }
+// Java imports
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-    /**
-     * Says hello to the world.
-     * @param args The arguments of the program.
-     */
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+// imports from classmates
+//import com.bushnell.Home;
+
+public class App {
+    public static void main(String[] args) throws Exception {
+        JFrame frame = new JFrame("MRP");
+        Home home = new Home();
+        JPanel homePanel = home.makeGUI();
+        frame.add(homePanel);
+        frame.pack();   
+        frame.setVisible(true);   
     }
 }
