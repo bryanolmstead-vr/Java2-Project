@@ -65,6 +65,7 @@ public class Home {
 
         // place an image on the panel as a JLabel
         JLabel logo = new GetImage().getImage("VisualRoboticsLogo.png", 180, 51);
+        logo.setOpaque(false); 
         logo.setAlignmentX(Component.LEFT_ALIGNMENT);
         menuBox.add(Box.createRigidArea(new Dimension(0,10)));
         menuBox.add(logo);
