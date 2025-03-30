@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 public class App {
     public static void main(String[] args) throws Exception {
         JFrame frame = new JFrame("MRP");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Home home = new Home();
         JPanel homePanel = home.makeGUI();
         frame.add(homePanel);
