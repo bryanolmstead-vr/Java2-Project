@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Color;
+import java.awt.Graphics;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -19,14 +20,19 @@ public class GUI {
 		component.setMaximumSize(new Dimension(w, h));
 	}
 
-    // create a centered text field
-    public static JLabel text(String textStr, int width, int height, int fontSize, Color color, String alignment) {
+    // create a text field with defined alignment
+    public static JLabel text(String textStr, int width, int height, int fontSize, Color color, String alignment, boolean bold) {
         JLabel label = new JLabel(textStr);
         setDimension(label, width, height);
-        label.setFont(new Font("Sans-Serif", Font.BOLD, fontSize)); 
+        if (bold)
+            label.setFont(new Font("Sans-Serif", Font.BOLD, fontSize));
+        else
+            label.setFont(new Font("Sans-Serif", Font.PLAIN, fontSize)); 
         label.setForeground(color);
         if (alignment == "left")
             label.setHorizontalAlignment(SwingConstants.LEFT);
+        else if (alignment == "right")
+            label.setHorizontalAlignment(SwingConstants.RIGHT);
         else
             label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);

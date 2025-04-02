@@ -10,13 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.CardLayout;
 
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import com.bushnell.UpdateStock;
 
 // Class to get images from the resources directory
 class GetImage {
@@ -86,7 +87,7 @@ public class Home {
 
         
         // add title "MRP System"
-        menuBox.add(GUI.text("MRP System", 200, 30, 20, Color.WHITE, "left"));  
+        menuBox.add(GUI.text("MRP System", 200, 30, 20, Color.WHITE, "left", true));  
         menuBox.add(Box.createRigidArea(new Dimension(0,50)));
 
         // create 4 buttons
@@ -118,16 +119,18 @@ public class Home {
         menuBox.add(buttonBox);
 
         // create panels for each sub-menu
-        JPanel updateStockPanel    = new JPanel();
+        JPanel updateStockPanel    = UpdateStock.makeGUI();
         JPanel stockReportPanel    = new JPanel();
         JPanel bundlePanel         = new JPanel();
         JPanel demandAnalysisPanel = new JPanel();
 
-        // add text on each JPanel
-        updateStockPanel.add(GUI.text("Update Stock",       200, 30, 20, Color.BLACK, "center"));  
-        stockReportPanel.add(GUI.text("Stock Report",       200, 30, 20, Color.BLACK, "center"));  
-        bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center"));  
-        demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center"));  
+        // add text on each JPanel 
+        stockReportPanel.add(GUI.text("Stock Report",       200, 30, 20, Color.BLACK, "center", true));  
+        bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center", true));  
+        demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center", true));
+        stockReportPanel.setBackground(Color.GRAY);
+        bundlePanel.setBackground(Color.GRAY);
+        demandAnalysisPanel.setBackground(Color.GRAY);   
 
         // create a card panel (only one panel visible at a time)
         JPanel cardPanel = new JPanel(new CardLayout());
