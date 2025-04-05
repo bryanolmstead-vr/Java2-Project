@@ -22,7 +22,7 @@ import com.bushnell.UpdateStock;
 // Class to get images from the resources directory
 class GetImage {
     public JLabel getImage(String filename, int w, int h) {
-        return new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("/resources/"+filename)).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
+        return new JLabel(new ImageIcon(new ImageIcon(getClass().getResource("/"+filename)).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH)));
     }
 }
 

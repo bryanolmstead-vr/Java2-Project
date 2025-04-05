@@ -8,9 +8,14 @@ import java.awt.event.ActionListener;
 import java.awt.Font;
 //import java.awt.event.FocusEvent;
 //import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
+
+//import org.w3c.dom.events.MouseEvent;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 //import javax.swing.JButton;
@@ -28,8 +33,9 @@ import com.bushnell.Part;
 public class UpdateStock {
 
     public static JLabel skuDescription;
-    public static JLabel skuPrice;
-    public static JLabel skuStock;
+    public static JTextField skuPrice;
+    public static JTextField skuStock;
+    public static JComboBox<String> skuList;
 
     public static JPanel makeGUI() {
 
@@ -56,7 +62,7 @@ public class UpdateStock {
         skuBox.add(GUI.text("sku", 150, 30, 20, Color.BLACK, "right", true));
         skuBox.add(Box.createRigidArea(new Dimension(50,0)));
         String[] skuArray = Database.getSkuList();
-        JComboBox<String> skuList = new JComboBox<>(skuArray);
+        skuList = new JComboBox<String>(skuArray);
         GUI.setDimension(skuList, 350, 40);
         skuList.setFont(new Font("Sans-Serif", Font.BOLD, 20));
         skuBox.add(skuList);
@@ -69,7 +75,6 @@ public class UpdateStock {
             public void actionPerformed(ActionEvent e) {
 
                 String sku = (String) skuList.getSelectedItem();
-                //System.out.println("User selected sku = " + sku);
                 Part part = Database.getSkuData(sku);
                 skuDescription.setText(part.description);
                 skuPrice.setText(String.format("%.2f", part.price));
@@ -81,7 +86,6 @@ public class UpdateStock {
 
         // look up initial sku
         String sku = (String) skuList.getSelectedItem();
-        //System.out.println("Initial sku = " + sku);
         Part part = Database.getSkuData(sku); 
 
         // create description
@@ -91,6 +95,7 @@ public class UpdateStock {
         descriptionBox.add(GUI.text("description", 150, 30, 20, Color.BLACK, "right", true));
         descriptionBox.add(Box.createRigidArea(new Dimension(50,0)));
         skuDescription = GUI.text(part.description, 300, 30, 20, Color.BLACK, "left", false);
+        skuDescription.setText(part.description);
         descriptionBox.add(skuDescription);
         GUI.setDimension(descriptionBox, 600, 50);
         panel.add(descriptionBox);
@@ -102,7 +107,8 @@ public class UpdateStock {
         priceBox.add(GUI.text("price", 150, 30, 20, Color.BLACK, "right", true));
         priceBox.add(Box.createRigidArea(new Dimension(50,0)));
         priceBox.add(GUI.text("$", 20, 30, 20, Color.BLACK, "left", true));
-        skuPrice = GUI.text(String.format("%.2f", part.price), 200, 30, 20, Color.BLACK, "left", false);
+        skuPrice = GUI.textField(6, 200, 30, 20);
+        skuPrice.setText(String.format("%.2f", part.price));
         priceBox.add(skuPrice);
         GUI.setDimension(priceBox, 600, 50);
         panel.add(priceBox);
@@ -113,14 +119,55 @@ public class UpdateStock {
         stockBox.setAlignmentY(Component.TOP_ALIGNMENT);
         stockBox.add(GUI.text("stock", 150, 30, 20, Color.BLACK, "right", true));
         stockBox.add(Box.createRigidArea(new Dimension(50,0)));
-        skuStock = GUI.text(Integer.toString(part.stock), 200, 30, 20, Color.BLACK, "left", false);
+        skuStock = GUI.textField(5, 200, 30, 20);
+        skuStock.setText(Integer.toString(part.stock));
         stockBox.add(skuStock);
         GUI.setDimension(stockBox, 600, 50);
         panel.add(stockBox);
 
-        Database.checkConnection();
-        Database.getSkuList();
+        // create price listener
+        skuPrice.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseExited(MouseEvent arg0) {
+                    updateSku();
+                }
+            });
+        skuPrice.addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    updateSku();
+                }
+            });
+
+        // create stock listener
+        skuStock.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseExited(MouseEvent arg0) {
+                updateSku();
+            }
+        });
+        skuStock.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                updateSku();
+            }
+        });
 
         return panel;      
+    }
+
+    public static void updateSku(){
+        String sku = (String)skuList.getSelectedItem();
+        Part oldPart = Database.getSkuData(sku);
+        Part part = new Part();
+        part.sku = sku;
+        part.description = oldPart.description; 
+        part.price = Double.parseDouble(skuPrice.getText());
+        part.stock = Integer.parseInt(skuStock.getText());
+        System.out.println("Updating sku=" + part.sku + " description=" + part.description +
+            " price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
+        boolean success = Database.updateSku(part);
+        if (!success)  
+            System.out.println("database update unsuccessful");
     }
 }
