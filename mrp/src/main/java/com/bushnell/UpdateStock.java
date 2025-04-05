@@ -129,14 +129,12 @@ public class UpdateStock {
         skuPrice.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseExited(MouseEvent arg0) {
-                    System.out.println("left price");
                     updateSku();
                 }
             });
         skuPrice.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
-                    System.out.println("entered price");
                     updateSku();
                 }
             });
@@ -145,14 +143,12 @@ public class UpdateStock {
         skuStock.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseExited(MouseEvent arg0) {
-                System.out.println("left stock");
                 updateSku();
             }
         });
         skuStock.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                System.out.println("entered stock");
                 updateSku();
             }
         });
