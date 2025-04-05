@@ -35,6 +35,7 @@ public class UpdateStock {
     public static JLabel skuDescription;
     public static JTextField skuPrice;
     public static JTextField skuStock;
+    public static JComboBox<String> skuList;
 
     public static JPanel makeGUI() {
 
@@ -61,7 +62,7 @@ public class UpdateStock {
         skuBox.add(GUI.text("sku", 150, 30, 20, Color.BLACK, "right", true));
         skuBox.add(Box.createRigidArea(new Dimension(50,0)));
         String[] skuArray = Database.getSkuList();
-        JComboBox<String> skuList = new JComboBox<>(skuArray);
+        skuList = new JComboBox<String>(skuArray);
         GUI.setDimension(skuList, 350, 40);
         skuList.setFont(new Font("Sans-Serif", Font.BOLD, 20));
         skuBox.add(skuList);
@@ -129,12 +130,14 @@ public class UpdateStock {
                 @Override
                 public void mouseExited(MouseEvent arg0) {
                     System.out.println("left price");
+                    updateSku();
                 }
             });
         skuPrice.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     System.out.println("entered price");
+                    updateSku();
                 }
             });
 
@@ -143,15 +146,30 @@ public class UpdateStock {
             @Override
             public void mouseExited(MouseEvent arg0) {
                 System.out.println("left stock");
+                updateSku();
             }
         });
         skuStock.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 System.out.println("entered stock");
+                updateSku();
             }
         });
 
         return panel;      
+    }
+
+    public static void updateSku(){
+        String sku = (String)skuList.getSelectedItem();
+        Part oldPart = Database.getSkuData(sku);
+        Part part = new Part();
+        part.sku = sku;
+        part.description = oldPart.description; 
+        part.price = Double.parseDouble(skuPrice.getText());
+        part.stock = Integer.parseInt(skuStock.getText());
+        System.out.println("Updating sku=" + part.sku + " description=" + part.description +
+            " price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
+        Database.updatesSku(part);
     }
 }

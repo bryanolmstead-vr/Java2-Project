@@ -78,4 +78,26 @@ public class Database {
         return result;
       }
     }
+
+    public static boolean updatesSku(Part part) 
+    {
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement statement = connection.createStatement();
+      )
+      {
+        ResultSet rs = statement.executeQuery(
+          "update part\n" +
+          "set price = " + Double.toString(part.price) + "\n" +
+          "set stock = " + Integer.toString(part.stock) + "\n" +
+          "where sku = \"" + part.sku + "\"" );
+        return true;         
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return false;
+      }
+    }
 }
