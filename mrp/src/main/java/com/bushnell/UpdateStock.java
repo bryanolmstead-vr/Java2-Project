@@ -170,6 +170,8 @@ public class UpdateStock {
         part.stock = Integer.parseInt(skuStock.getText());
         System.out.println("Updating sku=" + part.sku + " description=" + part.description +
             " price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
-        Database.updatesSku(part);
+        boolean success = Database.updateSku(part);
+        if (!success)  
+            System.out.println("database update unsuccessful");
     }
 }

@@ -17,7 +17,6 @@ public class Database {
     public static boolean checkConnection() {
       try {
         Class.forName("org.sqlite.JDBC");
-        //System.out.println("connected to " + DBName);
         return true;
     }
     catch(Exception e)
@@ -79,7 +78,7 @@ public class Database {
       }
     }
 
-    public static boolean updatesSku(Part part) 
+    public static boolean updateSku(Part part) 
     {
       try
       (
@@ -87,11 +86,11 @@ public class Database {
         Statement statement = connection.createStatement();
       )
       {
-        ResultSet rs = statement.executeQuery(
-          "update part\n" +
-          "set price = " + Double.toString(part.price) + "\n" +
-          "set stock = " + Integer.toString(part.stock) + "\n" +
-          "where sku = \"" + part.sku + "\"" );
+        String statementTxt =   "update part\n" +
+                                "set price = " + Double.toString(part.price) + ",\n" +
+                                "stock = " + Integer.toString(part.stock) + "\n" +
+                                "where sku = \"" + part.sku + "\"";
+        statement.executeUpdate(statementTxt);
         return true;         
       }
       catch(SQLException e)
