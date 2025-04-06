@@ -116,8 +116,6 @@ public class Database {
           part.description = rs.getString("description");
           part.price = rs.getDouble("price");
           part.stock = rs.getInt("stock");
-          System.out.println(" sku=" + part.sku + " description=\"" + part.description + "\" " +
-            "price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
           allSkuList.add(part);
         }
         return allSkuList;          
