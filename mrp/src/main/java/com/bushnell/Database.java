@@ -99,4 +99,33 @@ public class Database {
         return false;
       }
     }
+
+    public static List<Part> getAllSkuData() 
+    {
+      List<Part> allSkuList = new ArrayList<Part>();
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement statement = connection.createStatement();
+      )
+      {
+        ResultSet rs = statement.executeQuery("select * from part");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.description = rs.getString("description");
+          part.price = rs.getDouble("price");
+          part.stock = rs.getInt("stock");
+          System.out.println(" sku=" + part.sku + " description=\"" + part.description + "\" " +
+            "price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
+          allSkuList.add(part);
+        }
+        return allSkuList;          
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return allSkuList;
+      }
+    }    
 }

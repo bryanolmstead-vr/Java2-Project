@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.bushnell.UpdateStock;
+import com.bushnell.StockReport;
 
 // Class to get images from the resources directory
 class GetImage {
@@ -120,15 +121,13 @@ public class Home {
 
         // create panels for each sub-menu
         JPanel updateStockPanel    = UpdateStock.makeGUI();
-        JPanel stockReportPanel    = new JPanel();
+        JPanel stockReportPanel    = StockReport.makeGUI();
         JPanel bundlePanel         = new JPanel();
         JPanel demandAnalysisPanel = new JPanel();
 
         // add text on each JPanel 
-        stockReportPanel.add(GUI.text("Stock Report",       200, 30, 20, Color.BLACK, "center", true));  
         bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center", true));  
         demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center", true));
-        stockReportPanel.setBackground(Color.GRAY);
         bundlePanel.setBackground(Color.GRAY);
         demandAnalysisPanel.setBackground(Color.GRAY);   
 

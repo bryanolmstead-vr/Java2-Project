@@ -11,9 +11,6 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
 //import org.w3c.dom.events.MouseEvent;
 
 import javax.swing.Box;
