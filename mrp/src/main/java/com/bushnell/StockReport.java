@@ -26,6 +26,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 //import javax.swing.plaf.metal.MetalCheckBoxIcon;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 
 import com.bushnell.GUI;
 import com.bushnell.Database;
@@ -51,21 +52,28 @@ public class StockReport {
         GUI.setDimension(titleBox, 600, 100);
         panel.add(titleBox);
 
+        // create text title for sku list
+        Box textTitleBox = Box.createHorizontalBox();
+        textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
+        String textStr = String.format("%35s %8s %5s  %s\n", "SKU", "Price", "Stock", "Description");
+        JLabel textTitle = GUI.text(textStr, 500, 30, 14, Color.BLACK, "left", true);
+        textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+        textTitleBox.add(textTitle);
+        textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
+        panel.add(textTitleBox);
+
         // create text pane
         Box textBox = Box.createHorizontalBox();
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
         JTextArea stockText = new JTextArea(30, 60);  // 30 rows and 60 columns
+        stockText.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
         stockText.setEditable(false); 
         JScrollPane scroll = new JScrollPane(stockText);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         List<Part> allSkuList = Database.getAllSkuData();
-        //Integer i=1;
         for( Part part : allSkuList) {
-            //System.out.println("i=" + Integer.toString(i) + " sku=" + part.sku + " description=\"" + part.description + "\" " +
-            //                   "price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
-            stockText.append(String.format("%20s %4.2f %4d %s\n", part.sku, part.price, part.stock, part.description));
-            //i++;
+            stockText.append(String.format("%35s %8.2f %4d   %s\n", part.sku, part.price, part.stock, part.description));
         }
         textBox.add(scroll);
         textBox.add(Box.createRigidArea(new Dimension(20,0)));

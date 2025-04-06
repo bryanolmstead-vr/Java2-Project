@@ -52,7 +52,7 @@ public class GUI {
     public static JTextField textField(int numChars, int width, int height, int fontSize) {
         JTextField textField = new JTextField(numChars);
         setDimension(textField, width, height);
-        textField.setFont(new Font("Sans-Serif", Font.BOLD, fontSize));
+        textField.setFont(new Font("Sans-Serif", Font.BOLD, 20));
         return textField;
     }
 }
