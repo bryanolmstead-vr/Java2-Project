@@ -49,14 +49,19 @@ public class StockReport {
         titleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         titleBox.setAlignmentY(Component.TOP_ALIGNMENT);
         titleBox.add(GUI.text("Stock Report", 600, 30, 20, Color.BLACK, "center", true));
-        GUI.setDimension(titleBox, 600, 100);
+        GUI.setDimension(titleBox, 600, 50);
         panel.add(titleBox);
 
         // create text title for sku list
         Box textTitleBox = Box.createHorizontalBox();
+        textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textTitleBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
-        String textStr = String.format("%35s %8s %5s  %s\n", "SKU", "Price", "Stock", "Description");
-        JLabel textTitle = GUI.text(textStr, 500, 30, 14, Color.BLACK, "left", true);
+        String textStr = String.format("%35s %8s %6s %s\n", "SKU", "Price", "Stock", "Description");
+        JTextArea textTitle = new JTextArea(1,60);
+        textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+        textTitle.setEditable(false);
+        textTitle.append(textStr);
         textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         textTitleBox.add(textTitle);
         textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
@@ -64,6 +69,8 @@ public class StockReport {
 
         // create text pane
         Box textBox = Box.createHorizontalBox();
+        textBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textBox.setAlignmentY(Component.TOP_ALIGNMENT);
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
         JTextArea stockText = new JTextArea(30, 60);  // 30 rows and 60 columns
         stockText.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
@@ -73,7 +80,8 @@ public class StockReport {
 
         List<Part> allSkuList = Database.getAllSkuData();
         for( Part part : allSkuList) {
-            stockText.append(String.format("%35s %8.2f %4d   %s\n", part.sku, part.price, part.stock, part.description));
+            stockText.append(String.format("%35s %8s %4d   %s\n", 
+                part.sku, String.format("$%.2f", part.price), part.stock, part.description));
         }
         textBox.add(scroll);
         textBox.add(Box.createRigidArea(new Dimension(20,0)));

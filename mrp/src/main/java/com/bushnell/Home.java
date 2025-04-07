@@ -28,6 +28,12 @@ class GetImage {
 }
 
 public class Home {
+
+    JPanel updateStockPanel;
+    JPanel stockReportPanel;
+    JPanel bundlePanel;
+    JPanel demandAnalysisPanel;
+
     public JPanel makeGUI() {
         // create panel
         JPanel panel = new JPanel();
@@ -120,10 +126,10 @@ public class Home {
         menuBox.add(buttonBox);
 
         // create panels for each sub-menu
-        JPanel updateStockPanel    = UpdateStock.makeGUI();
-        JPanel stockReportPanel    = StockReport.makeGUI();
-        JPanel bundlePanel         = new JPanel();
-        JPanel demandAnalysisPanel = new JPanel();
+        updateStockPanel    = UpdateStock.makeGUI();
+        stockReportPanel    = StockReport.makeGUI();
+        bundlePanel         = new JPanel();
+        demandAnalysisPanel = new JPanel();
 
         // add text on each JPanel 
         bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center", true));  
@@ -155,6 +161,9 @@ public class Home {
             @Override
             public void actionPerformed(ActionEvent e) {
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
+                // update data before showing
+                stockReportPanel = StockReport.makeGUI();
+                cardPanel.add(stockReportPanel, "Stock Report");
                 cardLayout.show(cardPanel,"Stock Report");
             }
         });
