@@ -34,7 +34,7 @@ public class Home {
     JPanel bundlePanel;
     JPanel demandAnalysisPanel;
 
-    public JPanel makeGUI() {
+    public JPanel makeGUI(String appDir) {
         // create panel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -127,7 +127,7 @@ public class Home {
 
         // create panels for each sub-menu
         updateStockPanel    = UpdateStock.makeGUI();
-        stockReportPanel    = StockReport.makeGUI();
+        stockReportPanel    = StockReport.makeGUI(appDir, false);
         bundlePanel         = new JPanel();
         demandAnalysisPanel = new JPanel();
 
@@ -162,7 +162,7 @@ public class Home {
             public void actionPerformed(ActionEvent e) {
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
                 // update data before showing
-                stockReportPanel = StockReport.makeGUI();
+                stockReportPanel = StockReport.makeGUI(appDir, true);
                 cardPanel.add(stockReportPanel, "Stock Report");
                 cardLayout.show(cardPanel,"Stock Report");
             }
