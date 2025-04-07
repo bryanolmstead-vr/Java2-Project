@@ -17,6 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.bushnell.Database;
 import com.bushnell.UpdateStock;
 import com.bushnell.StockReport;
 
@@ -35,6 +39,14 @@ public class Home {
     JPanel demandAnalysisPanel;
 
     public JPanel makeGUI(String appDir) {
+        // set database directory
+        // provided directory is where jar file is
+        // this is in mrp/target, so go out 2 directories 
+        // to get to where the database is
+        Path jarPath = Paths.get(appDir);
+        String dbPath = jarPath.getParent().getParent().toString();
+        Database.setDBDirectory(dbPath);
+
         // create panel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -127,7 +139,7 @@ public class Home {
 
         // create panels for each sub-menu
         updateStockPanel    = UpdateStock.makeGUI();
-        stockReportPanel    = StockReport.makeGUI(appDir, false);
+        stockReportPanel    = StockReport.makeGUI(dbPath, false);
         bundlePanel         = new JPanel();
         demandAnalysisPanel = new JPanel();
 

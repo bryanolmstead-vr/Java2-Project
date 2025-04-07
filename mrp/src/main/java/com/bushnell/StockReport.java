@@ -37,7 +37,7 @@ import com.bushnell.Part;
 
 public class StockReport {
 
-    public static JPanel makeGUI(String appDir, boolean makePdf) {
+    public static JPanel makeGUI(String dbDir, boolean makePdf) {
 
         // create panel
         JPanel panel = new JPanel();
@@ -93,14 +93,15 @@ public class StockReport {
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
         panel.add(textBox);
 
-        makePdf = false;
+        makePdf = true;
         if (makePdf) {
             // create PDF document
             // print N sku entries per page
             // with header on the top of each page
             PDDocument document = new PDDocument();
-            PDPage pdfPage = null;
+            //PDPage pdfPage = null;
                     
+            /*
             // set this flag true at the beginning of each page
             // indicating the title should be put on the top of the page
             boolean newPage = true;
@@ -126,10 +127,11 @@ public class StockReport {
                     newPage = true;
                 }
             }
+            */
 
             //save PDF document
             String fileName = "StockReport.pdf";
-            String fullPath = Paths.get(appDir, fileName).toString();
+            String fullPath = Paths.get(dbDir, fileName).toString();
             try {
                 File existingFile = new File(fullPath);
                 if (existingFile.exists()) {

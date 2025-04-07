@@ -1,5 +1,6 @@
 package com.bushnell;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,11 +9,25 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.bushnell.Part;
 
 public class Database {
 
     public static String DBName = "jdbc:sqlite:VR-Factory.db";
+
+    public static boolean setDBDirectory(String directory) {
+      try {
+        Path fullPath = Paths.get(directory, "VR-Factory.db");
+        DBName = "jdbc:sqlite:" + fullPath.toString();  
+        System.out.println("setting DB path to: " + DBName);
+        return true;
+      } catch(Exception e) {
+        return false;
+      }
+    }
 
     public static boolean checkConnection() {
       try {
