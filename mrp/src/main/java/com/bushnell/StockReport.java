@@ -32,6 +32,9 @@ import javax.swing.SwingConstants;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
 import com.bushnell.GUI;
 import com.bushnell.Database;
@@ -39,7 +42,7 @@ import com.bushnell.Part;
 
 public class StockReport {
 
-    public static JPanel makeGUI(String dbDir, boolean makePdf) {
+    public static JPanel makeGUI(String dbDir, boolean makePdf) throws IOException {
 
         // create panel
         JPanel panel = new JPanel();
@@ -109,8 +112,8 @@ public class StockReport {
             // with header on the top of each page
             // first page should have a title
             PDDocument document = new PDDocument();
-            //PDPage pdfPage = null;
-            int skuPerPage = 20;
+            PDPage pdfPage = null;
+            int skuPerPage = 45;
 
             // set this flag true at the beginning of each page
             // indicating the sku column title should be put on the top of the page
@@ -119,33 +122,64 @@ public class StockReport {
             int skuCounter = 0;
             int pageNum = 0;
 
+            // define contentStream to use later
+            PDPageContentStream contentStream = null;
+
             // loop through all skus
             for( Part part : allSkuList) {
                 if (newPage) {
-                    if (pageNum == 0) {
-                        System.out.println("Visual Robotics Stock Report");
-                        System.out.println(formattedDateTime);
-                        System.out.println("");
-                    }
-                    // put the list title at the top of a new page
-                    System.out.println(columnTitle);
-                    System.out.println("---------------");
-                    //pdfPage = new PDPage();
-                    //document.addPage(pdfPage);
-                    // write topOfPageStr underlined at the top of the page
+                    // create new page and prepare to write on it
+                    pdfPage = new PDPage();
+                    document.addPage(pdfPage);
+                    pdfPage = document.getPage(pageNum);
+                    contentStream = new PDPageContentStream(document, pdfPage);
+                    // write Visual Robotics Stock Report
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),20);
+                    contentStream.newLineAtOffset(150,750);
+                    contentStream.showText("Visual Robotics Stock Report");
+                    contentStream.endText();
+                    // write date and page number
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
+                    contentStream.newLineAtOffset(220,730);
+                    contentStream.showText(formattedDateTime + " page " + Integer.toString(pageNum+1));
+                    contentStream.endText();
+                    // write header for columns
+                    contentStream.beginText();
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),10);
+                    contentStream.newLineAtOffset(0,700);
+                    contentStream.showText(columnTitle);
+                    contentStream.endText();
+                    // draw line under column header
+                    contentStream.setLineWidth(1f);
+                    contentStream.moveTo(10, 695);
+                    contentStream.lineTo(602, 695);
+                    contentStream.stroke();
+                    // set leading and start position for rows of parts
+                    contentStream.beginText();
+                    contentStream.setLeading(14.5f);
+                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),10);
+                    contentStream.newLineAtOffset(0,685);
                     newPage = false;
                 }
                 String newPart = String.format("%35s %8s %4d   %s", 
                     part.sku, String.format("$%.2f", part.price), part.stock, part.description);
-                System.out.println(newPart);
-                // write newPart in document
+                contentStream.showText(newPart);
+                contentStream.newLine();
                 skuCounter++;
                 if (skuCounter % skuPerPage == 0) {
-                    // create a new page
-                    System.out.println("");
+                    // close this page and prepare for a new page
+                    contentStream.endText();
+                    contentStream.close();
                     pageNum++;
                     newPage = true;
                 }
+            }
+            if (!newPage) {
+                // close the remainder of the last page
+                contentStream.endText();
+                contentStream.close();
             }
 
             //save PDF document
