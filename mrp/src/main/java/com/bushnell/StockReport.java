@@ -16,6 +16,8 @@ import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.security.ProtectionDomain;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -55,8 +57,6 @@ public class StockReport {
         GUI.setDimension(titleBox, 600, 50);
         panel.add(titleBox);
 
-
-
         // create text title for sku list
         Box textTitleBox = Box.createHorizontalBox();
         textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -93,52 +93,70 @@ public class StockReport {
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
         panel.add(textBox);
 
-        makePdf = true;
+        // only make PDF file when asked (when button is pressed)
         if (makePdf) {
+            // determine PDF filename
+            // VR-StockReport-2025.04.07-13.05.pdf
+            // where 13.05 is 1:05pm in 24hr time format
+
+            Date now = new Date();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
+            String formattedDateTime = formatter.format(now);
+            String filenamePDF = "VR-StockReport-" + formattedDateTime + ".pdf";
+
             // create PDF document
             // print N sku entries per page
             // with header on the top of each page
+            // first page should have a title
             PDDocument document = new PDDocument();
             //PDPage pdfPage = null;
-                    
-            /*
-            // set this flag true at the beginning of each page
-            // indicating the title should be put on the top of the page
-            boolean newPage = true;
-            String topOfPageStr = String.format("%35s %8s %6s %s\n", "SKU", "Price", "Stock", "Description");
-            int skuCounter = 0;
             int skuPerPage = 20;
+
+            // set this flag true at the beginning of each page
+            // indicating the sku column title should be put on the top of the page
+            boolean newPage = true;
+            String columnTitle = String.format("%35s %8s %6s %s", "SKU", "Price", "Stock", "Description");
+            int skuCounter = 0;
+            int pageNum = 0;
 
             // loop through all skus
             for( Part part : allSkuList) {
                 if (newPage) {
+                    if (pageNum == 0) {
+                        System.out.println("Visual Robotics Stock Report");
+                        System.out.println(formattedDateTime);
+                        System.out.println("");
+                    }
                     // put the list title at the top of a new page
-                    pdfPage = new PDPage();
-                    document.addPage(pdfPage);
+                    System.out.println(columnTitle);
+                    System.out.println("---------------");
+                    //pdfPage = new PDPage();
+                    //document.addPage(pdfPage);
                     // write topOfPageStr underlined at the top of the page
                     newPage = false;
                 }
                 String newPart = String.format("%35s %8s %4d   %s", 
                     part.sku, String.format("$%.2f", part.price), part.stock, part.description);
+                System.out.println(newPart);
                 // write newPart in document
                 skuCounter++;
                 if (skuCounter % skuPerPage == 0) {
                     // create a new page
+                    System.out.println("");
+                    pageNum++;
                     newPage = true;
                 }
             }
-            */
 
             //save PDF document
-            String fileName = "StockReport.pdf";
-            String fullPath = Paths.get(dbDir, fileName).toString();
+            String fullPath = Paths.get(dbDir, filenamePDF).toString();
             try {
                 File existingFile = new File(fullPath);
                 if (existingFile.exists()) {
                     existingFile.delete();
                 }                
                 document.save(fullPath);
-                System.out.print("saved pdf file in " + fullPath);
+                //System.out.println(fullPath);
             } catch(Exception e) {
                 System.out.println("can't save PDF file");
                 e.printStackTrace(System.err);

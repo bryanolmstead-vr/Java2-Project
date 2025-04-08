@@ -24,7 +24,7 @@ public class App {
                 .getPath();
         File jarFile = new File(jarPath);
         String jarDirectoryPath = jarFile.getParent();
-        System.out.println("Path to the JAR file: " + jarDirectoryPath);
+        //System.out.println("Path to the JAR file: " + jarDirectoryPath);
 
         JPanel homePanel = home.makeGUI(jarDirectoryPath);
         frame.add(homePanel);

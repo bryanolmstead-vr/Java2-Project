@@ -22,7 +22,7 @@ public class Database {
       try {
         Path fullPath = Paths.get(directory, "VR-Factory.db");
         DBName = "jdbc:sqlite:" + fullPath.toString();  
-        System.out.println("setting DB path to: " + DBName);
+        //System.out.println("setting DB path to: " + DBName);
         return true;
       } catch(Exception e) {
         return false;

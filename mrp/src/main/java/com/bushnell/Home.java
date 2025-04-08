@@ -174,7 +174,7 @@ public class Home {
             public void actionPerformed(ActionEvent e) {
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
                 // update data before showing
-                stockReportPanel = StockReport.makeGUI(appDir, true);
+                stockReportPanel = StockReport.makeGUI(dbPath, true);
                 cardPanel.add(stockReportPanel, "Stock Report");
                 cardLayout.show(cardPanel,"Stock Report");
             }
