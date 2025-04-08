@@ -11,9 +11,6 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
 //import org.w3c.dom.events.MouseEvent;
 
 import javax.swing.Box;
@@ -164,8 +161,8 @@ public class UpdateStock {
         part.description = oldPart.description; 
         part.price = Double.parseDouble(skuPrice.getText());
         part.stock = Integer.parseInt(skuStock.getText());
-        System.out.println("Updating sku=" + part.sku + " description=" + part.description +
-            " price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
+        //System.out.println("Updating sku=" + part.sku + " description=" + part.description +
+        //    " price=" + Double.toString(part.price) + " stock=" + Integer.toString(part.stock));
         boolean success = Database.updateSku(part);
         if (!success)  
             System.out.println("database update unsuccessful");

@@ -1,5 +1,6 @@
 package com.bushnell;
 
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -8,11 +9,25 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import com.bushnell.Part;
 
 public class Database {
 
     public static String DBName = "jdbc:sqlite:VR-Factory.db";
+
+    public static boolean setDBDirectory(String directory) {
+      try {
+        Path fullPath = Paths.get(directory, "VR-Factory.db");
+        DBName = "jdbc:sqlite:" + fullPath.toString();  
+        //System.out.println("setting DB path to: " + DBName);
+        return true;
+      } catch(Exception e) {
+        return false;
+      }
+    }
 
     public static boolean checkConnection() {
       try {
@@ -99,4 +114,31 @@ public class Database {
         return false;
       }
     }
+
+    public static List<Part> getAllSkuData() 
+    {
+      List<Part> allSkuList = new ArrayList<Part>();
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement statement = connection.createStatement();
+      )
+      {
+        ResultSet rs = statement.executeQuery("select * from part");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.description = rs.getString("description");
+          part.price = rs.getDouble("price");
+          part.stock = rs.getInt("stock");
+          allSkuList.add(part);
+        }
+        return allSkuList;          
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return allSkuList;
+      }
+    }    
 }

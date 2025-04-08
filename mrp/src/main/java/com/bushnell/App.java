@@ -1,5 +1,8 @@
 package com.bushnell;
 
+import java.io.File;
+import java.net.URL;
+
 // Java imports
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -12,7 +15,18 @@ public class App {
         JFrame frame = new JFrame("MRP");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Home home = new Home();
-        JPanel homePanel = home.makeGUI();
+
+        // get location of jar file (where PDF file should go)
+        String jarPath = App.class
+                .getProtectionDomain()
+                .getCodeSource()
+                .getLocation()
+                .getPath();
+        File jarFile = new File(jarPath);
+        String jarDirectoryPath = jarFile.getParent();
+        //System.out.println("Path to the JAR file: " + jarDirectoryPath);
+
+        JPanel homePanel = home.makeGUI(jarDirectoryPath);
         frame.add(homePanel);
         frame.pack();   
         frame.setVisible(true);   

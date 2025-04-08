@@ -9,6 +9,7 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.CardLayout;
+import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,7 +18,12 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.bushnell.Database;
 import com.bushnell.UpdateStock;
+import com.bushnell.StockReport;
 
 // Class to get images from the resources directory
 class GetImage {
@@ -27,7 +33,21 @@ class GetImage {
 }
 
 public class Home {
-    public JPanel makeGUI() {
+
+    JPanel updateStockPanel;
+    JPanel stockReportPanel;
+    JPanel bundlePanel;
+    JPanel demandAnalysisPanel;
+
+    public JPanel makeGUI(String appDir) {
+        // set database directory
+        // provided directory is where jar file is
+        // this is in mrp/target, so go out 2 directories 
+        // to get to where the database is
+        Path jarPath = Paths.get(appDir);
+        String dbPath = jarPath.getParent().getParent().toString();
+        Database.setDBDirectory(dbPath);
+
         // create panel
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -119,16 +139,18 @@ public class Home {
         menuBox.add(buttonBox);
 
         // create panels for each sub-menu
-        JPanel updateStockPanel    = UpdateStock.makeGUI();
-        JPanel stockReportPanel    = new JPanel();
-        JPanel bundlePanel         = new JPanel();
-        JPanel demandAnalysisPanel = new JPanel();
+        updateStockPanel    = UpdateStock.makeGUI();
+        try {
+            stockReportPanel    = StockReport.makeGUI(dbPath, false);
+        } catch(Exception e) {
+            e.printStackTrace(System.err);
+        }
+        bundlePanel         = new JPanel();
+        demandAnalysisPanel = new JPanel();
 
         // add text on each JPanel 
-        stockReportPanel.add(GUI.text("Stock Report",       200, 30, 20, Color.BLACK, "center", true));  
         bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center", true));  
         demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center", true));
-        stockReportPanel.setBackground(Color.GRAY);
         bundlePanel.setBackground(Color.GRAY);
         demandAnalysisPanel.setBackground(Color.GRAY);   
 
@@ -156,6 +178,13 @@ public class Home {
             @Override
             public void actionPerformed(ActionEvent e) {
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
+                // update data before showing
+                try {
+                    stockReportPanel = StockReport.makeGUI(dbPath, true);
+                } catch(Exception ee) {
+                    ee.printStackTrace(System.err); 
+                }
+                cardPanel.add(stockReportPanel, "Stock Report");
                 cardLayout.show(cardPanel,"Stock Report");
             }
         });
