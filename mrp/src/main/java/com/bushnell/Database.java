@@ -41,7 +41,7 @@ public class Database {
     }
     }
 
-    public static String[] getSkuList() 
+    public static String[] getSkuList(String filter) 
     {
       try
       (
@@ -49,7 +49,7 @@ public class Database {
         Statement statement = connection.createStatement();
       )
       {
-        ResultSet rs = statement.executeQuery("select sku from part");
+        ResultSet rs = statement.executeQuery("select sku from part where sku like '" + filter + "'");
         List<String> skuList = new ArrayList<>();
         while(rs.next()) {
           skuList.add(rs.getString("sku"));
