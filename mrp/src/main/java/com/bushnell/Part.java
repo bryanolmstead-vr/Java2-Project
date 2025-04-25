@@ -5,4 +5,5 @@ public class Part {
     String description;
     double price;
     int    stock;
+    int    quantity;
 }

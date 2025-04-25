@@ -141,4 +141,35 @@ public class Database {
         return allSkuList;
       }
     }    
+
+    public static List<Part> getAllSkuChildrenData(String sku) 
+    {
+      List<Part> allSkuList = new ArrayList<Part>();
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement statement = connection.createStatement();
+      )
+      {
+        ResultSet rs = statement.executeQuery(
+            "SELECT bom.sku, bom.quantity, part.stock, part.description " +
+            "FROM bom JOIN part " +
+            "ON bom.sku = part.sku " +
+            "WHERE parent_sku = \"" + sku + "\";");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.description = rs.getString("description");
+          part.stock = rs.getInt("stock");
+          part.quantity = rs.getInt("quantity");
+          allSkuList.add(part);
+        }
+        return allSkuList;          
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return allSkuList;
+      }
+    }  
 }

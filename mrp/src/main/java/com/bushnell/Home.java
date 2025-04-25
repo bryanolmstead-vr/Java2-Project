@@ -190,6 +190,8 @@ public class Home {
         bundleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println("new Bundle");
+                bundlePanel = Bundle.makeGUI();
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
                 cardLayout.show(cardPanel,"Bundle");
             }
