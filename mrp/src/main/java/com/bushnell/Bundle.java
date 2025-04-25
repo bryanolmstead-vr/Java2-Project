@@ -1,5 +1,9 @@
 package com.bushnell;
 
+import com.bushnell.GUI;
+import com.bushnell.Database;
+import com.bushnell.Part;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -15,17 +19,18 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 //import javax.swing.JButton;
 //import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
+//import javax.swing.JTextField;
 //import javax.swing.plaf.metal.MetalCheckBoxIcon;
-
-import com.bushnell.GUI;
-import com.bushnell.Database;
-import com.bushnell.Part;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.JSeparator;
 
 public class Bundle {
 
@@ -91,6 +96,7 @@ public class Bundle {
         skuDescription.setText(part.description);
         descriptionBox.add(skuDescription);
         GUI.setDimension(descriptionBox, 600, 50);
+        descriptionBox.setBorder(new LineBorder(Color.RED));
         panel.add(descriptionBox);
 
         // create stock
@@ -102,7 +108,54 @@ public class Bundle {
         skuStock = GUI.text(Integer.toString(part.stock), 50, 30, 20, Color.BLACK, "left", false);
         stockBox.add(skuStock);
         GUI.setDimension(stockBox, 600, 50);
+        stockBox.setBorder(new LineBorder(Color.RED));
         panel.add(stockBox);
+
+        // make bundle button
+        Box bundleBox = Box.createVerticalBox();
+        bundleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        bundleBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        //bundleBox.add(Box.createRigidArea(new Dimension(50,0)));
+        JButton bundleButton = GUI.button("Bundle",    200, 50, 20);
+        Color visualRoboticsGreen = Color.decode("#00af74");
+        bundleButton.setBackground(visualRoboticsGreen);
+        bundleButton.setForeground(Color.WHITE);
+        bundleBox.add(bundleButton);
+        //bundleBox.add(Box.createRigidArea(new Dimension(50,0)));
+        GUI.setDimension(bundleBox, 600, 50);
+        bundleBox.setBorder(new LineBorder(Color.RED));
+        panel.add(bundleBox);
+
+        // create Subcomponents title
+        Box subcomponentsTitleBox = Box.createVerticalBox();
+        subcomponentsTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subcomponentsTitleBox.setAlignmentY(Component.CENTER_ALIGNMENT);
+        subcomponentsTitleBox.add(GUI.text("Subcomponents", 600, 50, 20, Color.BLACK, "center", true));
+        GUI.setDimension(subcomponentsTitleBox, 600, 50);
+        subcomponentsTitleBox.setBorder(new LineBorder(Color.RED));
+        panel.add(subcomponentsTitleBox);
+
+        // create text title for bundle list
+        Box textTitleBox = Box.createHorizontalBox();
+        textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        textTitleBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
+        String textStr = String.format("%35s %8s %6s %s\n", "Stock", "Qty", "Part", "Description");
+        JTextArea textTitle = new JTextArea(1,60);
+        textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+        textTitle.setEditable(false);
+        textTitle.append(textStr);
+        textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+        textTitleBox.add(textTitle);
+        textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
+        GUI.setDimension(textTitleBox, 800, 50);
+        textTitleBox.add(Box.createVerticalStrut(10));
+        JSeparator separator = new JSeparator(SwingConstants.HORIZONTAL);
+        separator.setAlignmentX(Component.CENTER_ALIGNMENT);
+        separator.setMaximumSize(new Dimension(200, 2));
+        textTitleBox.add(separator); 
+        //textTitleBox.setBorder(new LineBorder(Color.RED));
+        panel.add(textTitleBox);
 
         return panel;      
     }
