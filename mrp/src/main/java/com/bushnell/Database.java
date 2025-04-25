@@ -41,7 +41,7 @@ public class Database {
     }
     }
 
-    public static String[] getSkuList() 
+    public static String[] getSkuList(String filter) 
     {
       try
       (
@@ -49,7 +49,7 @@ public class Database {
         Statement statement = connection.createStatement();
       )
       {
-        ResultSet rs = statement.executeQuery("select sku from part");
+        ResultSet rs = statement.executeQuery("select sku from part where sku like '" + filter + "'");
         List<String> skuList = new ArrayList<>();
         while(rs.next()) {
           skuList.add(rs.getString("sku"));
@@ -141,4 +141,73 @@ public class Database {
         return allSkuList;
       }
     }    
+
+    public static List<Part> getAllSkuChildrenData(String sku) 
+    {
+      List<Part> allSkuList = new ArrayList<Part>();
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement statement = connection.createStatement();
+      )
+      {
+        ResultSet rs = statement.executeQuery(
+            "SELECT bom.sku, bom.quantity, part.stock, part.description " +
+            "FROM bom JOIN part " +
+            "ON bom.sku = part.sku " +
+            "WHERE parent_sku = \"" + sku + "\";");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.description = rs.getString("description");
+          part.stock = rs.getInt("stock");
+          part.quantity = rs.getInt("quantity");
+          allSkuList.add(part);
+        }
+        return allSkuList;          
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return allSkuList;
+      }
+    }  
+
+    public static Boolean bundle(String sku) 
+    {
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement queryStatement = connection.createStatement();
+        Statement updateStatement = connection.createStatement();
+      )
+      {
+        System.out.println("Bundling " + sku);
+        ResultSet rs = queryStatement.executeQuery(
+            "SELECT bom.sku, bom.quantity, part.stock " +
+            "FROM bom JOIN part " +
+            "ON bom.sku = part.sku " +
+            "WHERE parent_sku = \"" + sku + "\";");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.stock = rs.getInt("stock");
+          part.quantity = rs.getInt("quantity");
+          System.out.println("  Decrementing sku " + part.sku + " by qty " + part.quantity + " with existing stock " + part.stock);
+          String s = "UPDATE part SET stock = stock - " + part.quantity + " WHERE sku = \"" + part.sku + "\"";
+          int x = updateStatement.executeUpdate(s);
+          System.out.println("  updated " + x + " records");
+        }   
+        System.out.println("  Incrementing sku " + sku + " by qty 1");
+        String s = "UPDATE part SET stock = stock + 1 WHERE sku = \"" + sku + "\"";
+        int x = updateStatement.executeUpdate(s);
+        System.out.println("  updated " + x + " records");
+        return true;       
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return false;
+      }
+    }      
 }

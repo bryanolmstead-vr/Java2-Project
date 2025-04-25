@@ -33,11 +33,12 @@ public class UpdateStock {
     public static JTextField skuPrice;
     public static JTextField skuStock;
     public static JComboBox<String> skuList;
+    public static JPanel panel = new JPanel();
 
     public static JPanel makeGUI() {
 
         // create panel
-        JPanel panel = new JPanel();
+        panel.removeAll();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -58,7 +59,7 @@ public class UpdateStock {
         skuBox.setAlignmentY(Component.TOP_ALIGNMENT);
         skuBox.add(GUI.text("sku", 150, 30, 20, Color.BLACK, "right", true));
         skuBox.add(Box.createRigidArea(new Dimension(50,0)));
-        String[] skuArray = Database.getSkuList();
+        String[] skuArray = Database.getSkuList("%");
         skuList = new JComboBox<String>(skuArray);
         GUI.setDimension(skuList, 350, 40);
         skuList.setFont(new Font("Sans-Serif", Font.BOLD, 20));

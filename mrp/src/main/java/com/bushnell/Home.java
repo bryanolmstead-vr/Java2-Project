@@ -145,13 +145,11 @@ public class Home {
         } catch(Exception e) {
             e.printStackTrace(System.err);
         }
-        bundlePanel         = new JPanel();
+        bundlePanel         = Bundle.makeGUI();
         demandAnalysisPanel = new JPanel();
 
-        // add text on each JPanel 
-        bundlePanel.add(GUI.text("Bundle",                  200, 30, 20, Color.BLACK, "center", true));  
+        // add text on each JPanel  
         demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center", true));
-        bundlePanel.setBackground(Color.GRAY);
         demandAnalysisPanel.setBackground(Color.GRAY);   
 
         // create a card panel (only one panel visible at a time)
@@ -192,6 +190,8 @@ public class Home {
         bundleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                System.out.println("new Bundle");
+                bundlePanel = Bundle.makeGUI();
                 CardLayout cardLayout = (CardLayout) cardPanel.getLayout();
                 cardLayout.show(cardPanel,"Bundle");
             }
