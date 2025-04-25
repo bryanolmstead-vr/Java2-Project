@@ -44,13 +44,12 @@ public class Bundle {
     public static JTextArea stockText;
     public static String[] skuArray;
     public static JScrollPane scroll;
+    public static JPanel panel = new JPanel();
 
     public static JPanel makeGUI() {
 
-        System.out.println("called Bundle.makeGUI()");
-
         // create panel
-        JPanel panel = new JPanel();
+        panel.removeAll();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -135,7 +134,7 @@ public class Bundle {
         Box textTitleBox = Box.createHorizontalBox();
         textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         textTitleBox.setAlignmentY(Component.CENTER_ALIGNMENT);
-        String textStr = "Stock  Qty                           Part  Description";
+        String textStr = "Stock  Qty  Part                            Description";
         JLabel textTitle = GUI.text(textStr, 600, 50, 20, Color.BLACK, "left", true);
         textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         textTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -172,10 +171,7 @@ public class Bundle {
         ActionListener skuListListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JComboBox<String> source = (JComboBox<String>) e.getSource();       
-                System.out.println("Bundle: updating skuList");
-                String sku = (String) source.getSelectedItem();
-                System.out.println("sku = " + sku);
+                String sku = (String) skuList.getSelectedItem();
                 Part part = Database.getSkuData(sku);
                 skuDescription.setText(part.description);
                 skuStock.setText(Integer.toString(part.stock));
@@ -190,6 +186,36 @@ public class Bundle {
         };
         skuList.addActionListener(skuListListener);
 
+        bundleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Bundling");
+                // get parent sku to bundle
+                String sku = (String) skuList.getSelectedItem();
+                if (updateSkuChildren(sku)) {
+                    // returns true if there is enough stock to bundle
+                    // bundle it
+                    Database.bundle(sku);
+                    // update display of children
+                    updateSkuChildren(sku);
+                    // update display of parent
+                    Part part = Database.getSkuData(sku);
+                    skuStock.setText(Integer.toString(part.stock));
+                    // update bundle button status
+                    Boolean canBundle = updateSkuChildren(sku);
+                    bundleButton.setEnabled(canBundle);
+                    if (canBundle) {
+                        bundleButton.setBackground(visualRoboticsGreen);
+                    } else {
+                        bundleButton.setBackground(Color.GRAY);
+                    }
+                } else {
+                    bundleButton.setEnabled(false);
+                    bundleButton.setBackground(Color.GRAY);
+                }
+            }
+        });
+
         return panel;      
     }
 
@@ -199,15 +225,12 @@ public class Bundle {
         stockText.setText("");
         Boolean canBundle = true;
         for( Part part1 : allSkuList) {
-            String newPart = String.format("%5d %4d %30s  %s\n", part1.stock, part1.quantity, part1.sku, part1.description);
+            String newPart = String.format("%5d %4d  %-30s  %s\n", part1.stock, part1.quantity, part1.sku, part1.description);
             stockText.append(newPart);
             if (part1.stock < part1.quantity) {
                 canBundle = false;
             }
         }
-        stockText.revalidate();
-        stockText.repaint();
-        System.out.println("updated stockText:" + stockText.getText());
         return canBundle;
     }
 

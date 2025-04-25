@@ -33,11 +33,12 @@ public class UpdateStock {
     public static JTextField skuPrice;
     public static JTextField skuStock;
     public static JComboBox<String> skuList;
+    public static JPanel panel = new JPanel();
 
     public static JPanel makeGUI() {
 
         // create panel
-        JPanel panel = new JPanel();
+        panel.removeAll();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 

@@ -172,4 +172,42 @@ public class Database {
         return allSkuList;
       }
     }  
+
+    public static Boolean bundle(String sku) 
+    {
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        Statement queryStatement = connection.createStatement();
+        Statement updateStatement = connection.createStatement();
+      )
+      {
+        System.out.println("Bundling " + sku);
+        ResultSet rs = queryStatement.executeQuery(
+            "SELECT bom.sku, bom.quantity, part.stock " +
+            "FROM bom JOIN part " +
+            "ON bom.sku = part.sku " +
+            "WHERE parent_sku = \"" + sku + "\";");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.stock = rs.getInt("stock");
+          part.quantity = rs.getInt("quantity");
+          System.out.println("  Decrementing sku " + part.sku + " by qty " + part.quantity + " with existing stock " + part.stock);
+          String s = "UPDATE part SET stock = stock - " + part.quantity + " WHERE sku = \"" + part.sku + "\"";
+          int x = updateStatement.executeUpdate(s);
+          System.out.println("  updated " + x + " records");
+        }   
+        System.out.println("  Incrementing sku " + sku + " by qty 1");
+        String s = "UPDATE part SET stock = stock + 1 WHERE sku = \"" + sku + "\"";
+        int x = updateStatement.executeUpdate(s);
+        System.out.println("  updated " + x + " records");
+        return true;       
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return false;
+      }
+    }      
 }
