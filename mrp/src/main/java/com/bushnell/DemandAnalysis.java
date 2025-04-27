@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Paths;
@@ -130,7 +131,7 @@ public class DemandAnalysis {
         textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         textTitleBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
-        String textStr = String.format("%35s %8s %s\n", "SKU", "Need", "Description");
+        String textStr = String.format("%35s  Need  Description\n", "SKU");
         JTextArea textTitle = new JTextArea(1,60);
         textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         textTitle.setEditable(false);
@@ -151,10 +152,13 @@ public class DemandAnalysis {
         JScrollPane scroll = new JScrollPane(stockText);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        List<Part> allSkuList = Database.getAllSkuData();
+        // populate demand list
+        int desiredQty = (int) desiredQtySpinner.getValue();
+        sku = "SUB-114-V01";
+        List<Part> allSkuList = Database.getRequiredStock(sku, desiredQty);
         for( Part part2 : allSkuList) {
-            String newPart = String.format("%35s %8s %4d   %s\n", 
-            part2.sku, String.format("$%.2f", part2.price), part2.stock, part2.description);
+            String newPart = String.format("%35s  %4d  %s\n", 
+            part2.sku, part2.quantity, part2.description);
             stockText.append(newPart);
         }
         textBox.add(scroll);
