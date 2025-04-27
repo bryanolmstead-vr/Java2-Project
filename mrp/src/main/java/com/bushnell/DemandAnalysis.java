@@ -33,6 +33,8 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.SpinnerNumberModel;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -52,6 +54,7 @@ public class DemandAnalysis {
     public static String[] skuArray;
     public static JLabel skuDescription;
     public static JSpinner desiredQtySpinner = new JSpinner();
+    public static JTextArea stockText = new JTextArea(30, 60);  // 30 rows and 60 columns
 
     public static JPanel makeGUI(String dbDir, boolean makePdf) throws IOException {
 
@@ -102,17 +105,6 @@ public class DemandAnalysis {
         //descriptionBox.setBorder(new LineBorder(Color.RED));
         panel.add(descriptionBox);
 
-        // create listener for sku selection
-        ActionListener skuListListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String sku = (String) skuList.getSelectedItem();
-                Part part = Database.getSkuData(sku);
-                skuDescription.setText(part.description);
-            }
-        };
-        skuList.addActionListener(skuListListener);
-
         // create desired qty spinner
         Box qtySpinnerBox = Box.createHorizontalBox();
         qtySpinnerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -146,24 +138,35 @@ public class DemandAnalysis {
         textBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         textBox.setAlignmentY(Component.TOP_ALIGNMENT);
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
-        JTextArea stockText = new JTextArea(30, 60);  // 30 rows and 60 columns
         stockText.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
         stockText.setEditable(false); 
         JScrollPane scroll = new JScrollPane(stockText);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        // populate demand list
-        int desiredQty = (int) desiredQtySpinner.getValue();
-        sku = "SUB-114-V01";
-        List<Part> allSkuList = Database.getRequiredStock(sku, desiredQty);
-        for( Part part2 : allSkuList) {
-            String newPart = String.format("%35s  %4d  %s\n", 
-            part2.sku, part2.quantity, part2.description);
-            stockText.append(newPart);
-        }
+        // populate initial demand list
+        updateDemandList();
         textBox.add(scroll);
         textBox.add(Box.createRigidArea(new Dimension(20,0)));
         panel.add(textBox);
+
+        // create listener for sku selection
+        ActionListener skuListListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String sku = (String) skuList.getSelectedItem();
+                Part part = Database.getSkuData(sku);
+                skuDescription.setText(part.description);
+                updateDemandList();
+            }
+        };
+        skuList.addActionListener(skuListListener);
+
+        desiredQtySpinner.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                updateDemandList();
+            }
+        });
 
         /*
         // only make PDF file when asked (when button is pressed)
@@ -274,6 +277,18 @@ public class DemandAnalysis {
         */
 
         return panel; 
+    }
+
+    public static void updateDemandList() {
+        int desiredQty = (int) desiredQtySpinner.getValue();
+        String sku = (String) skuList.getSelectedItem();
+        List<Part> allSkuList = Database.getRequiredStock(sku, desiredQty);
+        stockText.setText("");
+        for( Part part2 : allSkuList) {
+            String newPart = String.format("%35s  %4d  %s\n", 
+            part2.sku, part2.quantity, part2.description);
+            stockText.append(newPart);
+        }
     }
 
     
