@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.PreparedStatement;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -208,5 +209,37 @@ public class Database {
         e.printStackTrace(System.err);
         return false;
       }
-    }      
+    }   
+    
+    public static List<Part> getRequiredStock(String sku, int desiredQty) {
+      List<Part> requiredStockList = new ArrayList<Part>();
+      try
+      (
+        Connection connection = DriverManager.getConnection(DBName);
+        // BLO
+        //String queryString = "";
+        //PreparedStatement statement = connection.prepareStatement(queryString);
+      )
+      {
+        ResultSet rs = statement.executeQuery(
+            "SELECT bom.sku, bom.quantity, part.stock, part.description " +
+            "FROM bom JOIN part " +
+            "ON bom.sku = part.sku " +
+            "WHERE parent_sku = \"" + sku + "\";");
+        while(rs.next()) {
+          Part part = new Part();
+          part.sku = rs.getString("sku");
+          part.description = rs.getString("description");
+          part.stock = rs.getInt("stock");
+          part.quantity = rs.getInt("quantity");
+          allSkuList.add(part);
+        }
+        return allSkuList;          
+      }
+      catch(SQLException e)
+      {
+        e.printStackTrace(System.err);
+        return allSkuList;
+      }
+    }
 }

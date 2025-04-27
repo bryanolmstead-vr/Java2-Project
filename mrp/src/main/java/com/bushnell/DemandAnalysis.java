@@ -22,13 +22,17 @@ import java.util.Date;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import javax.swing.SpinnerNumberModel;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -43,6 +47,10 @@ import com.bushnell.Part;
 public class DemandAnalysis {
 
     public static JPanel panel = new JPanel();
+    public static JComboBox<String> skuList;
+    public static String[] skuArray;
+    public static JLabel skuDescription;
+    public static JSpinner desiredQtySpinner = new JSpinner();
 
     public static JPanel makeGUI(String dbDir, boolean makePdf) throws IOException {
 
@@ -62,12 +70,67 @@ public class DemandAnalysis {
         GUI.setDimension(titleBox, 600, 50);
         panel.add(titleBox);
 
+        // create sku entry
+        Box skuBox = Box.createHorizontalBox();
+        skuBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        skuBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        skuBox.add(GUI.text("sku", 150, 30, 20, Color.BLACK, "right", true));
+        skuBox.add(Box.createRigidArea(new Dimension(50,0)));
+        skuArray = Database.getSkuList("SUB%");
+        skuList = new JComboBox<String>(skuArray);
+        GUI.setDimension(skuList, 350, 40);
+        skuList.setFont(new Font("Sans-Serif", Font.BOLD, 20));
+        skuBox.add(skuList);
+        GUI.setDimension(skuBox, 600, 50);
+        panel.add(skuBox);
+
+        // look up initial sku
+        String sku = (String) skuList.getSelectedItem();
+        Part part = Database.getSkuData(sku);
+
+        // create description
+        Box descriptionBox = Box.createHorizontalBox();
+        descriptionBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        descriptionBox.setAlignmentY(Component.TOP_ALIGNMENT);
+        descriptionBox.add(GUI.text("description", 150, 30, 20, Color.BLACK, "right", true));
+        descriptionBox.add(Box.createRigidArea(new Dimension(50,0)));
+        skuDescription = GUI.text(part.description, 300, 30, 20, Color.BLACK, "left", false);
+        skuDescription.setText(part.description);
+        descriptionBox.add(skuDescription);
+        GUI.setDimension(descriptionBox, 600, 50);
+        //descriptionBox.setBorder(new LineBorder(Color.RED));
+        panel.add(descriptionBox);
+
+        // create listener for sku selection
+        ActionListener skuListListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String sku = (String) skuList.getSelectedItem();
+                Part part = Database.getSkuData(sku);
+                skuDescription.setText(part.description);
+            }
+        };
+        skuList.addActionListener(skuListListener);
+
+        // create desired qty spinner
+        Box qtySpinnerBox = Box.createHorizontalBox();
+        qtySpinnerBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        qtySpinnerBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        qtySpinnerBox.add(GUI.text("desired quantity", 175, 30, 20, Color.BLACK, "right", true));
+        qtySpinnerBox.add(Box.createRigidArea(new Dimension(50,0)));
+        desiredQtySpinner.setModel(new SpinnerNumberModel(1,1,100,1));
+        GUI.setDimension(desiredQtySpinner, 50,30);
+        qtySpinnerBox.add(desiredQtySpinner);
+        qtySpinnerBox.add(Box.createRigidArea(new Dimension(400,0)));
+        GUI.setDimension(qtySpinnerBox, 650, 50);
+        panel.add(qtySpinnerBox);
+
         // create text title for sku list
         Box textTitleBox = Box.createHorizontalBox();
         textTitleBox.setAlignmentX(Component.CENTER_ALIGNMENT);
         textTitleBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
         textTitleBox.add(Box.createRigidArea(new Dimension(20,0)));
-        String textStr = String.format("%35s %8s %6s %s\n", "SKU", "Price", "Stock", "Description");
+        String textStr = String.format("%35s %8s %s\n", "SKU", "Need", "Description");
         JTextArea textTitle = new JTextArea(1,60);
         textTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
         textTitle.setEditable(false);
@@ -89,9 +152,9 @@ public class DemandAnalysis {
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
         List<Part> allSkuList = Database.getAllSkuData();
-        for( Part part : allSkuList) {
+        for( Part part2 : allSkuList) {
             String newPart = String.format("%35s %8s %4d   %s\n", 
-            part.sku, String.format("$%.2f", part.price), part.stock, part.description);
+            part2.sku, String.format("$%.2f", part2.price), part2.stock, part2.description);
             stockText.append(newPart);
         }
         textBox.add(scroll);
@@ -207,5 +270,17 @@ public class DemandAnalysis {
         */
 
         return panel; 
+    }
+
+    
+    public static void main(String[] args) throws Exception {
+        JFrame frame = new JFrame("MRP");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(1000, 720));
+        frame.setMaximumSize(new Dimension(1000, 720));
+        JPanel homePanel = makeGUI("", false);
+        frame.add(homePanel);
+        frame.pack();   
+        frame.setVisible(true); 
     }
 }
