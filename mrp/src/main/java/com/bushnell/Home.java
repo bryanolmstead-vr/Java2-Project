@@ -140,17 +140,20 @@ public class Home {
 
         // create panels for each sub-menu
         updateStockPanel    = UpdateStock.makeGUI();
+
         try {
             stockReportPanel    = StockReport.makeGUI(dbPath, false);
         } catch(Exception e) {
             e.printStackTrace(System.err);
         }
-        bundlePanel         = Bundle.makeGUI();
-        demandAnalysisPanel = new JPanel();
 
-        // add text on each JPanel  
-        demandAnalysisPanel.add(GUI.text("Demand Analysis", 200, 30, 20, Color.BLACK, "center", true));
-        demandAnalysisPanel.setBackground(Color.GRAY);   
+        bundlePanel         = Bundle.makeGUI();
+
+        try {
+            demandAnalysisPanel    = DemandAnalysis.makeGUI(dbPath, false);
+        } catch(Exception e) {
+            e.printStackTrace(System.err);
+        }
 
         // create a card panel (only one panel visible at a time)
         JPanel cardPanel = new JPanel(new CardLayout());
