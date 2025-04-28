@@ -22,6 +22,7 @@ import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -168,118 +169,39 @@ public class DemandAnalysis {
             }
         });
 
-        /*
-        // only make PDF file when asked (when button is pressed)
-        if (makePdf) {
-            // determine PDF filename
-            // VR-StockReport-2025.04.07-13.05.pdf
-            // where 13.05 is 1:05pm in 24hr time format
+        // make PDF button
+        Box pdfButtonBox = Box.createVerticalBox();
+        pdfButtonBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pdfButtonBox.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        JButton pdfButton = GUI.button("Make PDF",    200, 50, 20);
+        Color visualRoboticsGreen = Color.decode("#00af74");
+        pdfButton.setBackground(visualRoboticsGreen);
+        pdfButton.setForeground(Color.WHITE);
+        pdfButtonBox.add(pdfButton);
+        GUI.setDimension(pdfButtonBox, 600, 50);
+        //bundleBox.setBorder(new LineBorder(Color.RED));
+        panel.add(Box.createRigidArea(new Dimension(0,20)));
+        panel.add(pdfButtonBox);
+        panel.add(Box.createRigidArea(new Dimension(0,20)));
 
-            Date now = new Date();
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
-            String formattedDateTime = formatter.format(now);
-            String filenamePDF = "VR-StockReport-" + formattedDateTime + ".pdf";
-
-            // create PDF document
-            // print N sku entries per page
-            // with header on the top of each page
-            // first page should have a title
-            PDDocument document = new PDDocument();
-            PDPage pdfPage = null;
-            int skuPerPage = 45;
-
-            // set this flag true at the beginning of each page
-            // indicating the sku column title should be put on the top of the page
-            boolean newPage = true;
-            String columnTitle = String.format("%35s %8s %6s %s", "SKU", "Price", "Stock", "Description");
-            int skuCounter = 0;
-            int pageNum = 0;
-
-            // define contentStream to use later
-            PDPageContentStream contentStream = null;
-
-            // loop through all skus
-            for( Part part : allSkuList) {
-                if (newPage) {
-                    // create new page and prepare to write on it
-                    pdfPage = new PDPage();
-                    document.addPage(pdfPage);
-                    pdfPage = document.getPage(pageNum);
-                    contentStream = new PDPageContentStream(document, pdfPage);
-                    // write Visual Robotics Stock Report
-                    contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),20);
-                    contentStream.newLineAtOffset(150,750);
-                    contentStream.showText("Visual Robotics Stock Report");
-                    contentStream.endText();
-                    // write date and page number
-                    contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
-                    contentStream.newLineAtOffset(220,730);
-                    contentStream.showText(formattedDateTime + " page " + Integer.toString(pageNum+1));
-                    contentStream.endText();
-                    // write header for columns
-                    contentStream.beginText();
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),10);
-                    contentStream.newLineAtOffset(0,700);
-                    contentStream.showText(columnTitle);
-                    contentStream.endText();
-                    // draw line under column header
-                    contentStream.setLineWidth(1f);
-                    contentStream.moveTo(10, 695);
-                    contentStream.lineTo(602, 695);
-                    contentStream.stroke();
-                    // set leading and start position for rows of parts
-                    contentStream.beginText();
-                    contentStream.setLeading(14.5f);
-                    contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),10);
-                    contentStream.newLineAtOffset(0,685);
-                    newPage = false;
-                }
-                String newPart = String.format("%35s %8s %4d   %s", 
-                    part.sku, String.format("$%.2f", part.price), part.stock, part.description);
-                contentStream.showText(newPart);
-                contentStream.newLine();
-                skuCounter++;
-                if (skuCounter % skuPerPage == 0) {
-                    // close this page and prepare for a new page
-                    contentStream.endText();
-                    contentStream.close();
-                    pageNum++;
-                    newPage = true;
+        // make PDF button listener
+        pdfButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Making PDF file");
+                try {
+                    makePDF(dbDir); 
+                } catch(Exception e2) {
+                    System.out.println("can't save PDF file");
+                    e2.printStackTrace(System.err);
                 }
             }
-            if (!newPage) {
-                // close the remainder of the last page
-                contentStream.endText();
-                contentStream.close();
-            }
-
-            //save PDF document
-            String fullPath = Paths.get(dbDir, filenamePDF).toString();
-            try {
-                File existingFile = new File(fullPath);
-                if (existingFile.exists()) {
-                    existingFile.delete();
-                }                
-                document.save(fullPath);
-                //System.out.println(fullPath);
-            } catch(Exception e) {
-                System.out.println("can't save PDF file");
-                e.printStackTrace(System.err);
-            }
-            try {
-                document.close();
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
-            }
-        }
-        */
+        });
 
         return panel; 
     }
 
-    public static void updateDemandList() {
+    public static List<Part> updateDemandList() {
         int desiredQty = (int) desiredQtySpinner.getValue();
         String sku = (String) skuList.getSelectedItem();
         List<Part> allSkuList = Database.getRequiredStock(sku, desiredQty);
@@ -289,6 +211,123 @@ public class DemandAnalysis {
             part2.sku, part2.quantity, part2.description);
             stockText.append(newPart);
         }
+        return allSkuList;
+    }
+
+    public static void makePDF(String dbDir) throws IOException {
+        // determine PDF filename
+        // VR-StockReport-2025.04.07-13.05.pdf
+        // where 13.05 is 1:05pm in 24hr time format
+
+        Date now = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd-HH.mm");
+        String formattedDateTime = formatter.format(now);
+        String filenamePDF = "DemandAnalysis-" + formattedDateTime + ".pdf";
+
+        // create PDF document
+        // print N sku entries per page
+        // with header on the top of each page
+        // first page should have a title
+        PDDocument document = new PDDocument();
+        PDPage pdfPage = null;
+        int skuPerPage = 40;
+
+        // set this flag true at the beginning of each page
+        // indicating the sku column title should be put on the top of the page
+        boolean newPage = true;
+        String columnTitle = String.format("%35s  Need  Description", "SKU");
+        int skuCounter = 0;
+        int pageNum = 0;
+
+        // get sku, qty, and demand list
+        List<Part> allSkuList =  updateDemandList();
+        int desiredQty = (int) desiredQtySpinner.getValue();
+        String sku = (String) skuList.getSelectedItem();
+
+        // define contentStream to use later
+        PDPageContentStream contentStream = null;
+
+        // loop through all skus
+        for( Part part : allSkuList) {
+            if (newPage) {
+                // create new page and prepare to write on it
+                pdfPage = new PDPage();
+                document.addPage(pdfPage);
+                pdfPage = document.getPage(pageNum);
+                contentStream = new PDPageContentStream(document, pdfPage);
+                // write Visual Robotics Demand Analysis
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),20);
+                contentStream.newLineAtOffset(150,750);
+                contentStream.showText("Visual Robotics Demand Analysis");
+                contentStream.endText();
+                // write date and page number
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
+                contentStream.newLineAtOffset(220,730);
+                contentStream.showText(formattedDateTime + " page " + Integer.toString(pageNum+1));
+                contentStream.endText();
+                // write part and desired qty
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
+                contentStream.newLineAtOffset(220,700);
+                contentStream.showText("SKU: " + sku + "  Qty: " + Integer.toString(desiredQty));
+                contentStream.endText();
+                // write header for columns
+                contentStream.beginText();
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),10);
+                contentStream.newLineAtOffset(0,680);
+                contentStream.showText(columnTitle);
+                contentStream.endText();
+                // draw line under column header
+                contentStream.setLineWidth(1f);
+                contentStream.moveTo(10, 675);
+                contentStream.lineTo(602, 675);
+                contentStream.stroke();
+                // set leading and start position for rows of parts
+                contentStream.beginText();
+                contentStream.setLeading(14.5f);
+                contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),10);
+                contentStream.newLineAtOffset(0,660);
+                newPage = false;
+            }
+            String newPart = String.format("%35s %8s %4d   %s", 
+                part.sku, String.format("$%.2f", part.price), part.stock, part.description);
+            contentStream.showText(newPart);
+            contentStream.newLine();
+            skuCounter++;
+            if (skuCounter % skuPerPage == 0) {
+                // close this page and prepare for a new page
+                contentStream.endText();
+                contentStream.close();
+                pageNum++;
+                newPage = true;
+            }
+        }
+        if (!newPage) {
+            // close the remainder of the last page
+            contentStream.endText();
+            contentStream.close();
+        }
+
+        //save PDF document
+        String fullPath = Paths.get(dbDir, filenamePDF).toString();
+        try {
+            File existingFile = new File(fullPath);
+            if (existingFile.exists()) {
+                existingFile.delete();
+            }                
+            document.save(fullPath);
+            //System.out.println(fullPath);
+        } catch(Exception e) {
+            System.out.println("can't save PDF file");
+            e.printStackTrace(System.err);
+        }
+        try {
+            document.close();
+        } catch (IOException e) {
+            e.printStackTrace(System.err);
+        }    
     }
 
     
