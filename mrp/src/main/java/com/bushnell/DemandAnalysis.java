@@ -309,6 +309,49 @@ public class DemandAnalysis {
             contentStream.endText();
             contentStream.close();
         }
+        if (allSkuList.size() == 0) {
+            // no parts - no pages made yet - make 1 page
+            pdfPage = new PDPage();
+            document.addPage(pdfPage);
+            pdfPage = document.getPage(pageNum);
+            PDPageContentStream contentStream2 = new PDPageContentStream(document, pdfPage);
+            // write Visual Robotics Demand Analysis
+            contentStream2.beginText();
+            contentStream2.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),20);
+            contentStream2.newLineAtOffset(150,750);
+            contentStream2.showText("Visual Robotics Demand Analysis");
+            contentStream2.endText();
+            // write date and page number
+            contentStream2.beginText();
+            contentStream2.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
+            contentStream2.newLineAtOffset(220,730);
+            contentStream2.showText(formattedDateTime + " page " + Integer.toString(pageNum+1));
+            contentStream2.endText();
+            // write part and desired qty
+            contentStream2.beginText();
+            contentStream2.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER),12);
+            contentStream2.newLineAtOffset(220,700);
+            contentStream2.showText("SKU: " + sku + "  Qty: " + Integer.toString(desiredQty));
+            contentStream2.endText();
+            // write header for columns
+            contentStream2.beginText();
+            contentStream2.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),10);
+            contentStream2.newLineAtOffset(0,680);
+            contentStream2.showText(columnTitle);
+            contentStream2.endText();
+            // draw line under column header
+            contentStream2.setLineWidth(1f);
+            contentStream2.moveTo(10, 675);
+            contentStream2.lineTo(602, 675);
+            contentStream2.stroke();
+            // write header for columns
+            contentStream2.beginText();
+            contentStream2.setFont(new PDType1Font(Standard14Fonts.FontName.COURIER_BOLD),10);
+            contentStream2.newLineAtOffset(20,650);
+            contentStream2.showText("all parts in stock");
+            contentStream2.endText();
+            contentStream2.close();
+        }
 
         //save PDF document
         String fullPath = Paths.get(dbDir, filenamePDF).toString();
